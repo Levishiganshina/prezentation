@@ -1,0 +1,51 @@
+import random
+import string
+
+# Список символов, которые мы умеем шифровать
+CHARS = string.ascii_letters + string.digits + string.punctuation + " " + "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+
+def process_text(text, key, mode):
+    result = ""
+    for i in range(len(text)):
+        char = text[i]
+        if char in CHARS:
+            idx = CHARS.find(char)
+            # Берем символ из ключа по кругу (циклический сдвиг)
+            key_char = key[i % len(key)]
+            key_idx = CHARS.find(key_char)
+            
+            if mode == 'enc':
+                new_idx = (idx + key_idx) % len(CHARS)
+            else:
+                new_idx = (idx - key_idx) % len(CHARS)
+            result += CHARS[new_idx]
+        else:
+            result += char # Если символа нет в списке, оставляем как есть
+    return result
+
+# --- ОСНОВНОЙ ИНТЕРФЕЙС ---
+print("--- Простой Шифратор/Дешифратор ---")
+action = input("Выбери действие (1 - Шифровать, 2 - Расшифровать): ")
+
+if action == '1':
+    msg = input("Введите текст для шифровки: ")
+    # Генерируем случайный ключ такой же длины, как сообщение
+    generated_key = ''.join(random.choice(CHARS) for _ in range(len(msg)))
+    
+    cipher = process_text(msg, generated_key, 'enc')
+    
+    print("\n--- РЕЗУЛЬТАТ ШИФРОВАНИЯ ---")
+    print(f"Зашифрованный текст: {cipher}")
+    print(f"КЛЮЧ (скопируйте его!): {generated_key}")
+
+elif action == '2':
+    cipher_input = input("Введите зашифрованный текст: ")
+    key_input = input("Введите ключ: ")
+    
+    if not key_input:
+        print("Ошибка: ключ не может быть пустым!")
+    else:
+        result = process_text(cipher_input, key_input, 'dec')
+        print("\n--- РЕЗУЛЬТАТ РАСШИФРОВКИ ---")
+        print(f"Оригинальный текст: {result}")
+
